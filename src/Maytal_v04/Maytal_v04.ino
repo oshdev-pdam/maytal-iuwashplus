@@ -3,6 +3,7 @@
 #define INTERVAL      5           //  Number of minutes between readings
 #define IO_USERNAME   "iqnaul"
 #define AIO_KEY       "1c58536b835f49aab1812ca1bb164bea"  //  Adafruit IO key
+#define FONASTR       FONAFlashStringPtr
 
 //- - - - - - - - - - - - - - - - - - - - - -
 
@@ -68,8 +69,7 @@ void setup()
 }
 
 void loop()
-{nmjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
-\
+{
   currentTime = RTC.get();
 
   Serial.print(hour(currentTime));

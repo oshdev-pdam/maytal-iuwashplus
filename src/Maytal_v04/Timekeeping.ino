@@ -52,7 +52,7 @@ void clockSet()
         (https://en.wikipedia.org/wiki/Network_Time_Protocol)
     */
     //fona.enableNTPTimeSync(true, "0.daimakerlab.pool.ntp.org");        //will change to NIST NTP server for obvious reasons
-    fona.enableNTPTimeSync(true, (FONAFlashStringPtr) "time.nist.gov");
+    fona.enableNTPTimeSync(true, (FONASTR) "time.nist.gov");
     Serial.println(F("Attempting to enable NTP sync."));
 
     wait(15000);                 // Wait for NTP server response

@@ -71,12 +71,12 @@ void fonaOff()
   }
 
   wait(500);
-  
+
   // Power down the FONA if it needs it
   if (digitalRead(FONA_PS) == HIGH)     //  If the FONA is on...
   {
-    fona.sendCheckReply(F("AT+CPOWD=1"), F("OK")); //  ...send shutdown command...
-    digitalWrite(FONA_KEY, HIGH);                  //  ...and set Key high
+    fona.sendCheckReply("AT+CPOWD=1", (FONASTR) "OK");    //  ...send shutdown command...
+    digitalWrite(FONA_KEY, HIGH);                         //  ...and set Key high
   }
 }
 
@@ -203,21 +203,21 @@ boolean postRequest(int feed, int value, int remainder, time_t epoch) {
   }
 
   //  Manually construct the HTTP POST headers necessary to send the data to the feed
-  fona.sendCheckReply(F("AT+HTTPINIT"), F("OK"));
-  fona.sendCheckReply(F("AT+HTTPPARA=\"CID\",1"), F("OK"));
+  fona.sendCheckReply("AT+HTTPINIT", (FONASTR) "OK");
+  fona.sendCheckReply("AT+HTTPPARA=\"CID\",1", (FONASTR) "OK");
   fona.print(F("AT+HTTPPARA=\"URL\",\"io.adafruit.com/api/v2/iqnaul/feeds/"));
   fona.print(feedString);
   fona.println(F("/data\""));
-  fona.expectReply(F("OK"));
-  fona.sendCheckReply(F("AT+HTTPPARA=\"REDIR\",\"0\""), F("OK"));
-  fona.sendCheckReply(F("AT+HTTPPARA=\"CONTENT\",\"application/json\""), F("OK"));
+  fona.expectReply((FONASTR) "OK");
+  fona.sendCheckReply("AT+HTTPPARA=\"REDIR\",\"0\"", (FONASTR) "OK");
+  fona.sendCheckReply("AT+HTTPPARA=\"CONTENT\",\"application/json\"", (FONASTR) "OK");
   fona.print(F("AT+HTTPPARA=\"USERDATA\",\"X-AIO-KEY: "));
   fona.print(AIO_KEY);
   fona.println(F("\""));
   Serial.print(F("AT+HTTPPARA=\"USERDATA\",\"X-AIO-KEY: "));
   Serial.print(F("XXXXXXXXXXXXXXXX"));
   Serial.println(F("\""));
-  fona.expectReply(F("OK"));
+  fona.expectReply((FONAFlashStringPtr)"OK");
   //fona.sendCheckReply(F("AT+HTTPSSL=1"), F("OK"));
 
   //  For debugging
@@ -227,49 +227,36 @@ boolean postRequest(int feed, int value, int remainder, time_t epoch) {
   Serial.println(F("/data\""));
 
   char json[64];
+
   /*if(remainder == 0) {
     sprintf(json, "{\"value\": %d, \"\created_epoch\": %s}", value, (char)epoch);
     } else {
     sprintf(json, "{\"value\": %d.%d, \"\created_epoch\": %s}", value, remainder, (char)epoch);
     }*/
 
-  if (remainder == 0) {
+  if (remainder == 0)
     sprintf(json, "{\"value\": %d}", value);
-  } else {
+  else
     sprintf(json, "{\"value\": %d.%d}", value, remainder);
-  }
 
   int dataSize = strlen(json);
 
   fona.print (F("AT+HTTPDATA="));
   fona.print (dataSize);
   fona.println (F(",2000"));
-  fona.expectReply (F("OK"));
+  fona.expectReply ((FONASTR) "OK");
 
-  fona.sendCheckReply(json, F("OK"));
+  fona.sendCheckReply(json, (FONASTR) "OK");
 
   Serial.println(json);
-
-  /*fona.print (F("{\"value\": "));
-    fona.print (value);
-    fona.print (F(",\"created_epoch\": "));
-    fona.print (epoch);
-    fona.println (F("}"));
-    fona.expectReply (F("OK"));*/
 
   //  For debugging
   Serial.print (F("AT+HTTPDATA="));
   Serial.print (dataSize);
   Serial.println (F(",2000"));
 
-  /*Serial.print (F("{\"value\": "));
-    Serial.print (value);
-    Serial.print (F(",\"created_epoch\": "));
-    Serial.print (epoch);
-    Serial.println (F("}"));*/
-
-  int statusCode;
-  int dataLen;
+  uint16_t statusCode;
+  uint16_t dataLen;
 
   fona.HTTP_action(1, &statusCode, &dataLen, 30000);   //  Send the POST request we've constructed
 
@@ -297,11 +284,7 @@ boolean postRequest(int feed, int value, int remainder, time_t epoch) {
   fona.HTTP_POST_end();
 
   if (statusCode == 200)
-  {
     return true;
-  }
   else
-  {
     return false;
-  }
 }
