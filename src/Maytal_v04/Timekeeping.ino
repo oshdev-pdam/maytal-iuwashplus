@@ -22,7 +22,7 @@ void clockSet()
   Serial.println(F("Attempting to get time from GSM location service..."));
 
   flushFona();    //  Flush any trailing data
-  fona.sendCheckReply(F("AT+CIPGSMLOC=2,1"), F("OK"));    //  Query GSM location service for time
+  fona.sendCheckReply("AT+CIPGSMLOC=2,1", "OK");    //  Query GSM location service for time
 
   fona.parseInt();                    //  Ignore first int
   int secondInt = fona.parseInt();    //  Ignore second int -- necessary on some networks/towers
@@ -51,7 +51,8 @@ void clockSet()
     /*   ...the we'll get time from the NTP pool instead:
         (https://en.wikipedia.org/wiki/Network_Time_Protocol)
     */
-    fona.enableNTPTimeSync(true, F("0.daimakerlab.pool.ntp.org"));        //will change to NIST NTP server for obvious reasons
+    //fona.enableNTPTimeSync(true, "0.daimakerlab.pool.ntp.org");        //will change to NIST NTP server for obvious reasons
+    fona.enableNTPTimeSync(true, (FONAFlashStringPtr) "time.nist.gov");
     Serial.println(F("Attempting to enable NTP sync."));
 
     wait(15000);                 // Wait for NTP server response

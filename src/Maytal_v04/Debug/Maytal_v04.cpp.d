@@ -1,0 +1,29 @@
+C:\Users\Aseptia\AppData\Local\Temp\VMBuilds\Maytal_v04\pro_8MHzatmega328\Debug\Maytal_v04.cpp.o: \
+ C:\Users\Aseptia\AppData\Local\Temp\VMBuilds\Maytal_v04\pro_8MHzatmega328\Debug\Maytal_v04.cpp \
+ C:\Users\Aseptia\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.20\cores\arduino/Arduino.h \
+ C:\Users\Aseptia\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.20\cores\arduino/binary.h \
+ C:\Users\Aseptia\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.20\cores\arduino/WCharacter.h \
+ C:\Users\Aseptia\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.20\cores\arduino/WString.h \
+ C:\Users\Aseptia\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.20\cores\arduino/HardwareSerial.h \
+ C:\Users\Aseptia\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.20\cores\arduino/Stream.h \
+ C:\Users\Aseptia\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.20\cores\arduino/Print.h \
+ C:\Users\Aseptia\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.20\cores\arduino/Printable.h \
+ C:\Users\Aseptia\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.20\cores\arduino/USBAPI.h \
+ C:\Users\Aseptia\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.20\cores\arduino/Arduino.h \
+ C:\Users\Aseptia\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.20\variants\eightanaloginputs/pins_arduino.h \
+ C:\Users\Aseptia\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.20\variants\eightanaloginputs/../standard/pins_arduino.h \
+ C:\Users\Aseptia\Documents\Arduino\libraries\Adafruit_FONA-master/Adafruit_FONA.h \
+ C:\Users\Aseptia\Documents\Arduino\libraries\Adafruit_FONA-master/includes/FONAConfig.h \
+ C:\Users\Aseptia\Documents\Arduino\libraries\Adafruit_FONA-master/includes/FONAExtIncludes.h \
+ C:\Users\Aseptia\Documents\Arduino\libraries\Adafruit_FONA-master/includes/FONAConfig.h \
+ C:\Users\Aseptia\Documents\Arduino\libraries\Adafruit_FONA-master/includes/platform/FONAPlatform.h \
+ C:\Users\Aseptia\Documents\Arduino\libraries\Adafruit_FONA-master/includes/platform/../FONAConfig.h \
+ C:\Users\Aseptia\Documents\Arduino\libraries\Adafruit_FONA-master/includes/platform/FONAPlatStd.h \
+ C:\Users\Aseptia\Documents\Arduino\libraries\DS3232RTC-master/DS3232RTC.h \
+ C:\Users\Aseptia\Documents\Arduino\libraries\Time-master/Time.h \
+ C:\Users\Aseptia\Documents\Arduino\libraries\Time-master/TimeLib.h \
+ C:\Users\Aseptia\Documents\Arduino\libraries\Sleep_n0m1-master/Sleep_n0m1.h \
+ C:\Users\Aseptia\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.20\libraries\SoftwareSerial\src/SoftwareSerial.h \
+ C:\Users\Aseptia\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.20\cores\arduino/Stream.h \
+ C:\Users\Aseptia\Documents\Arduino\libraries\Time-master/TimeLib.h \
+ C:\Users\Aseptia\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.20\libraries\Wire\src/Wire.h

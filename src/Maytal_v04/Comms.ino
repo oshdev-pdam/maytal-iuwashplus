@@ -8,7 +8,7 @@ void flushFona()
   }
 }
 
-boolean sendPressure(int pressure)
+boolean sendPressure(short pressure)
 {
   fonaOn();
 
@@ -51,7 +51,7 @@ boolean sendPressure(int pressure)
     attempts++;
   }
 
-  lastPressure = pressure;
+  //lastPressure = pressure;        //needs readjusting to per-minute data array.
   fonaOff();
 
   return success;

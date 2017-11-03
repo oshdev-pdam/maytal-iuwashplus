@@ -22,8 +22,11 @@
 #define FONA_KEY 8            //  FONA Key pin
 #define FONA_PS 9             //  FONA power status pin
 
-time_t currentTime;
-int lastPressure = 0;
+time_t  currentTime;
+time_t  dataTimestamps[INTERVAL];
+short   pressureData[INTERVAL];
+short   dataIndex = 0;
+
 boolean sentData = false;
 
 Adafruit_FONA fona = Adafruit_FONA (FONA_RST);
@@ -65,51 +68,46 @@ void setup()
 }
 
 void loop()
-{
+{nmjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
+\
   currentTime = RTC.get();
 
   Serial.print(hour(currentTime));
   Serial.print(F(":"));
+  
   if (minute(currentTime) < 10)
-  {
-    Serial.print(F("0"));
-  }
+    Serial.print(F("0"));               //clock left zero padding
   Serial.println(minute(currentTime));
 
-  int currentPressure = readPressure();
-
-  Serial.print(currentPressure);
-  Serial.println(F(" PSI."));
-
-  //  If pressure has changed more than 10% since last upload, upload new reading
-  if (((lastPressure * 100) - (currentPressure * 100)) / currentPressure >= 10)
+  if (dataIndex < INTERVAL-1 )          //if data buffer hasn't filled yet
   {
-    sendPressure(currentPressure);
+    dataTimestamps[dataIndex] = currentTime;
+    pressureData[dataIndex] = readPressure();
+    dataIndex++;
   }
 
-  //  If it is time to send a scheduled reading, send it
-  if (minute(currentTime) % INTERVAL == 0 && sentData == false)
+  else if (dataIndex == INTERVAL - 1)     //safeguard
   {
-    if (sendPressure(currentPressure) == true)
+    short x;
+    for (x = 0; x < 5; x++)
     {
-      sentData = true;
+      sendPressure(pressureData[x]);
     }
   }
-  else
-  {
-    sentData = false;
-  }
 
-  Serial.flush();         //  Flush any serial output before sleep
+  Serial.print(pressureData[dataIndex]);
+  Serial.println(F(" PSI."));
+
+  Serial.flush();                       //  Flush any serial output before sleep
   RTC.setAlarm(ALM1_MATCH_SECONDS, 0, 0, 0, 1);
-  RTC.alarm(ALARM_1);     //  Clear any outstanding RTC alarms
+  RTC.alarm(ALARM_1);                   //  Clear any outstanding RTC alarms
   RTC.alarmInterrupt(ALARM_1, true);
   sleep.pwrDownMode();
   wait(500);
   sleep.sleepInterrupt(digitalPinToInterrupt(RTC_INTERRUPT_PIN), FALLING); //  Sleep; wake on falling voltage on RTC pin
 }
 
-void wait(unsigned int ms)  //  Non-blocking delay function
+void wait(unsigned int ms)  //  Non-blocking delay function (STILL HIGHLY UNDER-UTILIZED)
 {
   unsigned long period = millis() + ms;
   while (millis() < period)
@@ -117,3 +115,22 @@ void wait(unsigned int ms)  //  Non-blocking delay function
     Serial.flush();
   }
 }
+
+/*  DEPRECATED: 10% filter to save power and data sending status return mechanism
+//  If pressure has changed more than 10% since last upload, upload new reading
+if (((lastPressure * 100) - (currentPressure * 100)) / currentPressure >= 10)
+{
+sendPressure(currentPressure);
+}
+
+//  If it is time to send a scheduled reading, send it
+if (minute(currentTime) % INTERVAL == 0 && sentData == false)
+{
+if (sendPressure(currentPressure) == true)
+sentData = true;
+else
+sentData = false;
+}
+//else                            //probably misplaced else clause
+//  sentData = false;
+*/
