@@ -8,53 +8,50 @@ void flushFona()
   }
 }
 
-boolean sendPressure(short pressure)
+boolean sendPressure()
 {
+  short index;
+  int whole;
+  boolean result = false;
+  int attempts = 0;
+
   fonaOn();
 
   Serial.println(F("Sending pressure reading..."));
 
-  char url[255];
-
-  unsigned int voltage;
-  fona.getBattVoltage(&voltage);              //  Read the battery voltage from FONA's ADC
-
-  //  Convert PSI to bar
-  float bar = pressure * 0.069;
-  int whole = bar;
-  int remainder = (bar - whole) * 1000;       //WHAT??????
-
-  boolean success = false;
-  int attempts = 0;
-
-  wait(7500);                                 //  A long delay here seems to improve reliability
-
-  while (success == false && attempts < 5)  //  We'll attempt up to five times to upload data
+  for (index = 0; index < INTERVAL - 1; index++)
   {
-    if (postRequest(1, bar, remainder, currentTime) == false) 
-      success = false;
-          
-    else 
-    {
-      if (postRequest(2, pressure, 0, currentTime) == false) 
-        success = false;
-      
-      else 
-      {
-        if (postRequest(3, voltage, 0, currentTime) == false) 
-          success = false;
-        
-        else 
-          success = true;
-      }
-    }
-    attempts++;
+    //  Convert PSI to bar
+    bar[index] = pressureData[index] * 0.069;
+    whole = (int) bar[index];
+    remainder[index] = (bar[index] - whole) * 1000;       //WHAT??????
   }
 
+  for (index = 0; index < INTERVAL - 1; index++)
+  {
+    while (result == false && attempts < 5)    //  We'll attempt up to five times to upload data
+    {
+      if (postRequest(1, bar[index], remainder[index], dataTimestamps[index]) == false)
+        result = false;
+      else
+      {
+        if (postRequest(2, pressureData[index], 0, dataTimestamps[index]) == false)
+          result = false;
+        else
+        {
+          if (postRequest(3, voltage[index], 0, dataTimestamps[index]) == false)
+            result = false;
+          else
+            result = true;
+        }
+      }
+      attempts++;
+    }
+  }
   //lastPressure = pressure;        //needs readjusting to per-minute data array.
   fonaOff();
 
-  return success;
+  return result;
 }
 
 void fonaOff()
@@ -180,27 +177,16 @@ boolean fonaOn()
   }
 }
 
-boolean postRequest(int feed, int value, int remainder, time_t epoch) {
+boolean postRequest(int feed, int value, int remainder, time_t epoch) 
+{
   String feedString;
 
-  switch (feed) {
-    case 1: {
-        feedString = "bar";
-        break;
-      }
-    case 2: {
-        feedString = "psi";
-        break;
-      }
-    case 3: {
-        feedString = "voltage";
-        break;
-      }
-    default: {
-        return false;
-      }
-      break;
-  }
+  if (feed == 1)
+    feedString = "bar";
+  if (feed == 2)
+    feedString = "psi";
+  if (feed == 3)
+    feedString = "voltage";
 
   //  Manually construct the HTTP POST headers necessary to send the data to the feed
   fona.sendCheckReply("AT+HTTPINIT", (FONASTR) "OK");
@@ -215,9 +201,8 @@ boolean postRequest(int feed, int value, int remainder, time_t epoch) {
   fona.print(AIO_KEY);
   fona.println(F("\""));
   Serial.print(F("AT+HTTPPARA=\"USERDATA\",\"X-AIO-KEY: "));
-  Serial.print(F("XXXXXXXXXXXXXXXX"));
-  Serial.println(F("\""));
-  fona.expectReply((FONAFlashStringPtr)"OK");
+  Serial.print(F("XXXXXXXXXXXXXXXX\"\n"));
+  fona.expectReply((FONASTR)"OK");
   //fona.sendCheckReply(F("AT+HTTPSSL=1"), F("OK"));
 
   //  For debugging
@@ -265,7 +250,7 @@ boolean postRequest(int feed, int value, int remainder, time_t epoch) {
     while (fona.available())
     {
       char c = fona.read();
-      loop_until_bit_is_set (UCSR0A, UDRE0);
+      loop_until_bit_is_set (UCSR0A, UDRE0);           // Kinda dumb blocking wait
       UDR0 = c;
     }
 

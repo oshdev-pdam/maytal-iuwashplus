@@ -26,7 +26,15 @@
 time_t  currentTime;
 time_t  dataTimestamps[INTERVAL];
 short   pressureData[INTERVAL];
+int     remainder[INTERVAL];
+float   bar[INTERVAL];
+int     voltage[INTERVAL];
 short   dataIndex = 0;
+char    url[100];                              //  does it really need to be 255 char long?
+
+char method;
+int netOffset;
+char theDate[17];
 
 boolean sentData = false;
 
@@ -79,7 +87,7 @@ void loop()
     Serial.print(F("0"));               //clock left zero padding
   Serial.println(minute(currentTime));
 
-  if (dataIndex < INTERVAL-1 )          //if data buffer hasn't filled yet
+  if (dataIndex < INTERVAL - 1)          //if data buffer hasn't filled yet
   {
     dataTimestamps[dataIndex] = currentTime;
     pressureData[dataIndex] = readPressure();
@@ -87,13 +95,7 @@ void loop()
   }
 
   else if (dataIndex == INTERVAL - 1)     //safeguard
-  {
-    short x;
-    for (x = 0; x < 5; x++)
-    {
-      sendPressure(pressureData[x]);
-    }
-  }
+    sendPressure();
 
   Serial.print(pressureData[dataIndex]);
   Serial.println(F(" PSI."));

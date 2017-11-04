@@ -14,10 +14,6 @@ void setRTCInterrupt()
 
 void clockSet()
 {
-  char method;
-  int netOffset;
-  char theDate[17];
-
   wait(1000);    //  Give time for any trailing data to come in from FONA
   Serial.println(F("Attempting to get time from GSM location service..."));
 
