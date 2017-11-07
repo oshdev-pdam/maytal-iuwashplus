@@ -2,7 +2,7 @@
 #define UTCOFFSET     +7          //  Local standard time variance from UTC
 #define INTERVAL      5           //  Number of minutes between readings
 #define IO_USERNAME   "iqnaul"
-#define AIO_KEY       "1c58536b835f49aab1812ca1bb164bea"  //  Adafruit IO key
+#define AIO_KEY       "XXXX"  //  Adafruit IO key
 #define FONASTR       FONAFlashStringPtr
 
 //- - - - - - - - - - - - - - - - - - - - - -
