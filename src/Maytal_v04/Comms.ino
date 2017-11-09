@@ -15,8 +15,6 @@ boolean sendPressure()
   boolean result = false;
   int attempts = 0;
 
-  fonaOn();
-
   Serial.println(F("Sending pressure reading..."));
 
   for (index = 0; index < INTERVAL - 1; index++)
@@ -29,7 +27,7 @@ boolean sendPressure()
 
   for (index = 0; index < INTERVAL - 1; index++)          // EXCLUDE REINIT FONA
   {
-    while (result == false && attempts < 5)    //  We'll attempt up to five times to upload data
+    while (result == false && attempts < 5)               //  We'll attempt up to five times to upload data
     {
       if (postRequest(1, bar[index], remainder[index], dataTimestamps[index]) == false)
         result = false;
@@ -57,7 +55,7 @@ boolean sendPressure()
 
 void fonaOff()
 {
-  wait(5000);        //  Shorter delays yield unpredictable results
+  wait(5000);                                             //  TEST: Validate "Shorter delays yield unpredictable results"
 
   //  We'll turn GPRS off first, just to have an orderly shutdown
   if (fona.enableGPRS(false) == false)
@@ -71,32 +69,58 @@ void fonaOff()
   wait(500);
 
   // Power down the FONA if it needs it
-  if (digitalRead(FONA_PS) == HIGH)     //  If the FONA is on...
+  if (digitalRead(FONA_PS) == HIGH)                       //  If the FONA is on...
   {
     fona.sendCheckReply("AT+CPOWD=1", (FONASTR) "OK");    //  ...send shutdown command...
     digitalWrite(FONA_KEY, HIGH);                         //  ...and set Key high
   }
+
+  fonaSerial.end();                                       //  will probably clean up memory
 }
 
-boolean fonaOn()
+void fonaOn()
 {
-  if (digitalRead(FONA_PS) == LOW)                //  If the FONA is off...
+  if (digitalRead(FONA_PS) == LOW)                        //  If the FONA is off...
   {
     Serial.print(F("Powering FONA on..."));
     while (digitalRead(FONA_PS) == LOW)
     {
-      digitalWrite(FONA_KEY, LOW);                //  ...pulse the Key pin low...
+      digitalWrite(FONA_KEY, LOW);                        //  ...pulse the Key pin low...
       wait(500);
     }
-    digitalWrite(FONA_KEY, HIGH);                 //  ...and then return it to high
+    digitalWrite(FONA_KEY, HIGH);                         //  ...and then return it to high
+    Serial.println(F(" done."));
+  }
+
+  Serial.println(F("Flicking up the FONA"));
+
+  fonaSerial.begin(4800);                                 //  Open a serial interface to FONA
+
+  if (fona.begin(fonaSerial) == false)                    //  Start the FONA on serial interface
+    Serial.println(F("FONA not found. Check wiring and power."));
+  else
+    Serial.print(F("FONA online. "));
+}
+
+boolean fonaInitialize()
+{
+  if (digitalRead(FONA_PS) == LOW)                        //  If the FONA is off...
+  {
+    Serial.print(F("Powering FONA on..."));
+    while (digitalRead(FONA_PS) == LOW)
+    {
+      digitalWrite(FONA_KEY, LOW);                        //  ...pulse the Key pin low...
+      wait(500);
+    }
+    digitalWrite(FONA_KEY, HIGH);                         //  ...and then return it to high
     Serial.println(F(" done."));
   }
 
   Serial.println(F("Initializing FONA..."));
 
-  fonaSerial.begin(4800);                      //  Open a serial interface to FONA
+  fonaSerial.begin(4800);                                 //  Open a serial interface to FONA
 
-  if (fona.begin(fonaSerial) == false)        //  Start the FONA on serial interface
+  if (fona.begin(fonaSerial) == false)                    //  Start the FONA on serial interface
   {
     Serial.println(F("FONA not found. Check wiring and power."));
     return false;
@@ -139,9 +163,9 @@ boolean fonaOn()
     Serial.print(F("RSSI: "));
     Serial.println(rssi);
 
-    wait(3000);    //  Give the network a moment
+    wait(3000);                                             // TEST: Optimize "Give the network a moment"
 
-    //fona.setGPRSNetworkSettings(F("internet"));    //  Set APN to your local carrier
+    //fona.setGPRSNetworkSettings(F("internet"));           // Set APN to your local carrier
 
     if (rssi > 5)
     {

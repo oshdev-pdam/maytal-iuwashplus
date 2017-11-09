@@ -12,6 +12,14 @@ void setRTCInterrupt()
   RTC.alarmInterrupt(ALARM_1, true);
 }
 
+void blinky()
+{
+  if (digitalRead(LEDPIN))
+    digitalWrite(LEDPIN, LOW);
+  else
+    digitalWrite(LEDPIN, HIGH);
+}
+
 void clockSet()
 {
   wait(1000);    //  Give time for any trailing data to come in from FONA
@@ -104,3 +112,5 @@ void clockSet()
 
   wait(200);              //  Give FONA a moment to catch its breath
 }
+
+

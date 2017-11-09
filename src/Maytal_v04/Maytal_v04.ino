@@ -22,20 +22,21 @@
 #define FONA_TX 7             //  UART pin from FONA
 #define FONA_KEY 8            //  FONA Key pin
 #define FONA_PS 9             //  FONA power status pin
+#define LEDPIN  13            //  Pro Mini LED pin
 
-time_t  currentTime;
-time_t  dataTimestamps[INTERVAL];
-short   pressureData[INTERVAL];
-int     remainder[INTERVAL];
-float   bar[INTERVAL];
-int     voltage[INTERVAL];
-short   dataIndex = 0;
-char    url[100];                              //  does it really need to be 255 char long?
+time_t    currentTime;
+time_t    dataTimestamps[INTERVAL];
+short     pressureData[INTERVAL];
+int       remainder[INTERVAL];
+float     bar[INTERVAL];
+uint16_t  voltage[INTERVAL];
+short     dataIndex = 0;
+char      url[100];                              //  does it really need to be 255 char long?
 
 char method;
 int netOffset;
 char theDate[17];
-int volt;
+uint16_t volt;
 
 boolean sentData = false;
 
@@ -60,13 +61,13 @@ void setup()
 
   setRTCInterrupt();
 
-  //attach RTC 1-minute pulse interrupt then enable all-interrupts (#asm("sei")) 
+  //attach RTC 1-minute pulse interrupt then enable all-interrupts
   attachInterrupt(digitalPinToInterrupt(RTC_INTERRUPT_PIN), rtcIRQ, FALLING);
   interrupts();
 
   digitalWrite(Q1, LOW);    //  Turn off transducer to save power
 
-  fonaOn();
+  fonaInitialize();
   clockSet();
 
   //Delete any accumulated SMS messages to avoid interference from old commands
@@ -88,23 +89,31 @@ void loop()
     Serial.print(F("0"));                 //clock left zero padding
   Serial.println(minute(currentTime));
 
+  blinky();
+  fonaOn();
+
   if (dataIndex < INTERVAL - 1)           //if data buffer hasn't filled yet
   {
     dataTimestamps[dataIndex] = currentTime;
     pressureData[dataIndex] = readPressure();
     fona.getBattVoltage(&volt);                     //  Read the battery voltage from FONA's ADC
     voltage[dataIndex] = volt;
+    Serial.print(F("Volt #"));
+    Serial.print(dataIndex);
+    Serial.print(F(" "));
+    Serial.println(voltage[dataIndex]);
     dataIndex++;  
   }
 
-  else if (dataIndex == INTERVAL - 1)               //safeguard
+  blinky();
+
+  if (dataIndex == INTERVAL - 1)                    // if index equals zero-indexed array size (INTERVAL-1)
   {
-    fonaOn();
+    fonaInitialize();
     sendPressure();                                 //TO-DO: Implement logic when sendPressure() returns false
     fonaOff();
   }
-    
-
+  
   Serial.print(pressureData[dataIndex]);
   Serial.println(F(" PSI."));
 
@@ -114,6 +123,7 @@ void loop()
   RTC.alarmInterrupt(ALARM_1, true);
   sleep.pwrDownMode();
   wait(500);
+
   sleep.sleepInterrupt(digitalPinToInterrupt(RTC_INTERRUPT_PIN), FALLING); //  Sleep; wake on falling voltage on RTC pin
 }
 
