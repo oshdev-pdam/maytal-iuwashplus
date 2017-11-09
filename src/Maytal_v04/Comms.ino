@@ -27,7 +27,7 @@ boolean sendPressure()
     remainder[index] = (bar[index] - whole) * 1000;       //WHAT??????
   }
 
-  for (index = 0; index < INTERVAL - 1; index++)
+  for (index = 0; index < INTERVAL - 1; index++)          // EXCLUDE REINIT FONA
   {
     while (result == false && attempts < 5)    //  We'll attempt up to five times to upload data
     {
@@ -48,6 +48,7 @@ boolean sendPressure()
       attempts++;
     }
   }
+
   //lastPressure = pressure;        //needs readjusting to per-minute data array.
   fonaOff();
 
@@ -201,7 +202,7 @@ boolean postRequest(int feed, int value, int remainder, time_t epoch)
   fona.print(AIO_KEY);
   fona.println(F("\""));
   Serial.print(F("AT+HTTPPARA=\"USERDATA\",\"X-AIO-KEY: "));
-  Serial.print(F("XXXXXXXXXXXXXXXX\"\n"));
+  Serial.print(AIO_KEY);
   fona.expectReply((FONASTR)"OK");
   //fona.sendCheckReply(F("AT+HTTPSSL=1"), F("OK"));
 

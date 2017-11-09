@@ -2,7 +2,7 @@
 #define UTCOFFSET     +7          //  Local standard time variance from UTC
 #define INTERVAL      5           //  Number of minutes between readings
 #define IO_USERNAME   "iqnaul"
-#define AIO_KEY       "XXXX"  //  Adafruit IO key
+#define AIO_KEY       "1c58536b835f49aab1812ca1bb164bea"  //  Adafruit IO key
 #define FONASTR       FONAFlashStringPtr
 
 //- - - - - - - - - - - - - - - - - - - - - -
@@ -35,6 +35,7 @@ char    url[100];                              //  does it really need to be 255
 char method;
 int netOffset;
 char theDate[17];
+int volt;
 
 boolean sentData = false;
 
@@ -84,25 +85,32 @@ void loop()
   Serial.print(F(":"));
   
   if (minute(currentTime) < 10)
-    Serial.print(F("0"));               //clock left zero padding
+    Serial.print(F("0"));                 //clock left zero padding
   Serial.println(minute(currentTime));
 
-  if (dataIndex < INTERVAL - 1)          //if data buffer hasn't filled yet
+  if (dataIndex < INTERVAL - 1)           //if data buffer hasn't filled yet
   {
     dataTimestamps[dataIndex] = currentTime;
     pressureData[dataIndex] = readPressure();
-    dataIndex++;
+    fona.getBattVoltage(&volt);                     //  Read the battery voltage from FONA's ADC
+    voltage[dataIndex] = volt;
+    dataIndex++;  
   }
 
-  else if (dataIndex == INTERVAL - 1)     //safeguard
-    sendPressure();
+  else if (dataIndex == INTERVAL - 1)               //safeguard
+  {
+    fonaOn();
+    sendPressure();                                 //TO-DO: Implement logic when sendPressure() returns false
+    fonaOff();
+  }
+    
 
   Serial.print(pressureData[dataIndex]);
   Serial.println(F(" PSI."));
 
-  Serial.flush();                       //  Flush any serial output before sleep
+  Serial.flush();                                   //  Flush any serial output before sleep
   RTC.setAlarm(ALM1_MATCH_SECONDS, 0, 0, 0, 1);
-  RTC.alarm(ALARM_1);                   //  Clear any outstanding RTC alarms
+  RTC.alarm(ALARM_1);                               //  Clear any outstanding RTC alarms
   RTC.alarmInterrupt(ALARM_1, true);
   sleep.pwrDownMode();
   wait(500);
